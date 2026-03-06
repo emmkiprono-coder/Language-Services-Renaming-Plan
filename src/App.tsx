@@ -1,31 +1,36 @@
 import { useState } from "react";
 
-/* ───────── Supabase config ───────── */
-const SUPABASE_URL = "https://maqhsewvvemcaaaxavop.supabase.co";
-const SUPABASE_KEY = "sb_publishable_pGyVjqptkLhYqwe2rI85Lw_u1TLqK5F";
+/* ───────── JSONBin config ───────── */
+const JSONBIN_API_KEY = "$2a$10$M6W9ulyMKcxTdIcDcjhuVOm12ccNO2UeYG9e581pkl4mA3aX5Dvu.";
+const SUBMISSIONS_BIN = "69aa570cd0ea881f40f3f470";
 
 async function saveSubmission(entry: Record<string, unknown>) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/submissions`, {
-    method: "POST",
+  /* 1. Read current array */
+  const getRes = await fetch(`https://api.jsonbin.io/v3/b/${SUBMISSIONS_BIN}/latest`, {
+    headers: { "X-Access-Key": JSONBIN_API_KEY },
+  });
+  if (!getRes.ok) throw new Error(`Read failed: ${getRes.status}`);
+  const data = await getRes.json();
+  const existing: unknown[] = Array.isArray(data.record) ? data.record : [];
+
+  /* 2. Append new entry (filter out _init placeholder) */
+  const cleaned = existing.filter(
+    (r: any) => !(r && typeof r === "object" && "_init" in r)
+  );
+  cleaned.push({ ...entry, submittedAt: new Date().toISOString() });
+
+  /* 3. Write back */
+  const putRes = await fetch(`https://api.jsonbin.io/v3/b/${SUBMISSIONS_BIN}`, {
+    method: "PUT",
     headers: {
       "Content-Type": "application/json",
-      "apikey": SUPABASE_KEY,
-      "Prefer": "return=minimal",
+      "X-Access-Key": JSONBIN_API_KEY,
     },
-    body: JSON.stringify({
-      full_name: entry.fullName,
-      department: entry.department,
-      proposed_name: entry.proposedName,
-      rationale: entry.rationale,
-      unification: entry.unification,
-      real_world_test: entry.realWorldTest,
-      cultural_significance: entry.culturalSignificance || null,
-      tagline: entry.tagline || null,
-    }),
+    body: JSON.stringify(cleaned),
   });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.message || `Submission failed: ${res.status}`);
+  if (!putRes.ok) {
+    const err = await putRes.json().catch(() => ({}));
+    throw new Error(err.message || `Save failed: ${putRes.status}`);
   }
 }
 
