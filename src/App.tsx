@@ -1,27 +1,25 @@
 import { useState } from "react";
 
 /* ───────── JSONBin via Vite env vars ───────── */
-const JSONBIN_BIN_ID  = import.meta.env.VITE_JSONBIN_BIN_ID;
-const JSONBIN_API_KEY = import.meta.env.VITE_JSONBIN_API_KEY;
-const JSONBIN_URL     = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
+const JSONBIN_API_KEY    = import.meta.env.VITE_JSONBIN_API_KEY;
+const JSONBIN_COLLECTION = import.meta.env.VITE_JSONBIN_COLLECTION_ID;
 
 async function saveToJsonBin(entry: Record<string, unknown>) {
-  const getRes = await fetch(JSONBIN_URL + "/latest", {
-    headers: { "X-Access-Key": JSONBIN_API_KEY },
-  });
-  const existing = getRes.ok ? (await getRes.json())?.record ?? [] : [];
-  const updated = Array.isArray(existing) ? [...existing, entry] : [entry];
-
-  const putRes = await fetch(JSONBIN_URL, {
-    method: "PUT",
+  const res = await fetch("https://api.jsonbin.io/v3/b", {
+    method: "POST",
     headers: {
       "Content-Type": "application/json",
       "X-Access-Key": JSONBIN_API_KEY,
+      "X-Collection-Id": JSONBIN_COLLECTION,
+      "X-Bin-Name": `submission-${Date.now()}`,
     },
-    body: JSON.stringify(updated),
+    body: JSON.stringify(entry),
   });
-  if (!putRes.ok) throw new Error(`JSONBin PUT failed: ${putRes.status}`);
-  return updated;
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || `JSONBin failed: ${res.status}`);
+  }
+  return res.json();
 }
 
 /* ───────── types ───────── */
