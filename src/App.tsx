@@ -1,8 +1,10 @@
 import { useState } from "react";
 
-/* ───────── JSONBin via Vite env vars ───────── */
-const JSONBIN_API_KEY    = import.meta.env.VITE_JSONBIN_API_KEY;
-const JSONBIN_COLLECTION = import.meta.env.VITE_JSONBIN_COLLECTION_ID;
+/* ───────── JSONBin config ─────────
+   Each submission creates a new bin in your account.
+   No Collection required — works on free tier.
+   ─────────────────────────────────── */
+const JSONBIN_API_KEY = "$2a$10$M6W9ulyMKcxTdIcDcjhuVOm12ccNO2UeYG9e581pkl4mA3aX5Dvu.";
 
 async function saveToJsonBin(entry: Record<string, unknown>) {
   const res = await fetch("https://api.jsonbin.io/v3/b", {
@@ -10,8 +12,8 @@ async function saveToJsonBin(entry: Record<string, unknown>) {
     headers: {
       "Content-Type": "application/json",
       "X-Access-Key": JSONBIN_API_KEY,
-      "X-Collection-Id": JSONBIN_COLLECTION,
       "X-Bin-Name": `submission-${Date.now()}`,
+      "X-Bin-Private": "false",
     },
     body: JSON.stringify(entry),
   });
@@ -301,6 +303,7 @@ export default function App() {
         background: "linear-gradient(180deg, #e0e7ff 0%, #ede9fe 15%, #f5f3ff 30%, #f0fdfa 50%, #ecfdf5 65%, #fdf4ff 80%, #fae8ff 100%)",
       }}
     >
+      {/* ── nav bar ── */}
       <nav
         style={{
           position: "sticky",
@@ -329,6 +332,7 @@ export default function App() {
         </div>
       </nav>
 
+      {/* ── hero ── */}
       <header style={{ paddingTop: 64, paddingBottom: 40, textAlign: "center", paddingLeft: 24, paddingRight: 24 }}>
         <div
           style={{
@@ -363,6 +367,7 @@ export default function App() {
         </p>
       </header>
 
+      {/* ── mission ── */}
       <div style={{ maxWidth: 640, margin: "0 auto", padding: "0 24px", marginBottom: 40 }}>
         <div
           style={{
@@ -424,6 +429,7 @@ export default function App() {
         </div>
       </div>
 
+      {/* ── quote ── */}
       <div style={{ maxWidth: 640, margin: "0 auto", padding: "0 24px", marginBottom: 40 }}>
         <div
           style={{
@@ -439,68 +445,196 @@ export default function App() {
         </div>
       </div>
 
+      {/* ── form ── */}
       <main style={{ maxWidth: 640, margin: "0 auto", padding: "0 24px", paddingBottom: 80 }}>
         <StepDots current={filled} total={REQUIRED.length} />
 
+        {/* section: identity */}
         <div style={cardStyle("linear-gradient(135deg, rgba(238,242,255,0.8), rgba(224,231,255,0.5))")}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg, #c7d2fe, #a5b4fc)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+            <div
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 10,
+                background: "linear-gradient(135deg, #c7d2fe, #a5b4fc)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
             </div>
             <h2 style={{ fontSize: 18, fontWeight: 700, color: "#312e81" }}>Your Information</h2>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
             <Field label="Full Name" required error={errors.fullName}>
-              <input type="text" value={form.fullName} onChange={set("fullName")} placeholder="Jane Doe" style={inputStyle(errors.fullName)} onFocus={(e) => { e.target.style.borderColor = "#818cf8"; e.target.style.boxShadow = "0 0 0 3px rgba(129,140,248,0.15)"; }} onBlur={(e) => { e.target.style.borderColor = errors.fullName ? "#fca5a5" : "#c7d2fe"; e.target.style.boxShadow = "none"; }} />
+              <input
+                type="text"
+                value={form.fullName}
+                onChange={set("fullName")}
+                placeholder="Jane Doe"
+                style={inputStyle(errors.fullName)}
+                onFocus={(e) => { e.target.style.borderColor = "#818cf8"; e.target.style.boxShadow = "0 0 0 3px rgba(129,140,248,0.15)"; }}
+                onBlur={(e) => { e.target.style.borderColor = errors.fullName ? "#fca5a5" : "#c7d2fe"; e.target.style.boxShadow = "none"; }}
+              />
             </Field>
             <Field label="Team / Department" required error={errors.department}>
-              <input type="text" value={form.department} onChange={set("department")} placeholder="Interpretation, Translation…" style={inputStyle(errors.department)} onFocus={(e) => { e.target.style.borderColor = "#818cf8"; e.target.style.boxShadow = "0 0 0 3px rgba(129,140,248,0.15)"; }} onBlur={(e) => { e.target.style.borderColor = errors.department ? "#fca5a5" : "#c7d2fe"; e.target.style.boxShadow = "none"; }} />
+              <input
+                type="text"
+                value={form.department}
+                onChange={set("department")}
+                placeholder="Interpretation, Translation…"
+                style={inputStyle(errors.department)}
+                onFocus={(e) => { e.target.style.borderColor = "#818cf8"; e.target.style.boxShadow = "0 0 0 3px rgba(129,140,248,0.15)"; }}
+                onBlur={(e) => { e.target.style.borderColor = errors.department ? "#fca5a5" : "#c7d2fe"; e.target.style.boxShadow = "none"; }}
+              />
             </Field>
           </div>
         </div>
 
+        {/* section: proposal */}
         <div style={cardStyle("linear-gradient(135deg, rgba(204,251,241,0.5), rgba(207,250,254,0.4))")}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg, #99f6e4, #67e8f9)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0f766e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" /></svg>
+            <div
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 10,
+                background: "linear-gradient(135deg, #99f6e4, #67e8f9)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0f766e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+              </svg>
             </div>
             <h2 style={{ fontSize: 18, fontWeight: 700, color: "#134e4a" }}>Your Proposed Name</h2>
           </div>
-          <p style={{ fontSize: 12, color: "#5eead4", marginBottom: 20, marginLeft: 46, fontWeight: 500 }}>Choose a name that bridges languages and cultures for patients who need us most.</p>
+          <p style={{ fontSize: 12, color: "#5eead4", marginBottom: 20, marginLeft: 46, fontWeight: 500 }}>
+            Choose a name that bridges languages and cultures for patients who need us most.
+          </p>
           <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
             <Field label="Proposed Team Name" required error={errors.proposedName}>
-              <input type="text" value={form.proposedName} onChange={set("proposedName")} placeholder="Enter your proposed team name" style={{ ...inputStyle(errors.proposedName), fontSize: 18, fontWeight: 700, border: `1.5px solid ${errors.proposedName ? "#fca5a5" : "#5eead4"}` }} onFocus={(e) => { e.target.style.borderColor = "#14b8a6"; e.target.style.boxShadow = "0 0 0 3px rgba(20,184,166,0.12)"; }} onBlur={(e) => { e.target.style.borderColor = errors.proposedName ? "#fca5a5" : "#5eead4"; e.target.style.boxShadow = "none"; }} />
+              <input
+                type="text"
+                value={form.proposedName}
+                onChange={set("proposedName")}
+                placeholder="Enter your proposed team name"
+                style={{ ...inputStyle(errors.proposedName), fontSize: 18, fontWeight: 700, border: `1.5px solid ${errors.proposedName ? "#fca5a5" : "#5eead4"}` }}
+                onFocus={(e) => { e.target.style.borderColor = "#14b8a6"; e.target.style.boxShadow = "0 0 0 3px rgba(20,184,166,0.12)"; }}
+                onBlur={(e) => { e.target.style.borderColor = errors.proposedName ? "#fca5a5" : "#5eead4"; e.target.style.boxShadow = "none"; }}
+              />
             </Field>
-            <Field label="Meaning & Rationale" required hint="How does this name connect to our mission of bridging languages and cultures?" error={errors.rationale}>
-              <textarea value={form.rationale} onChange={set("rationale")} placeholder="Explain the meaning behind your proposed name…" rows={4} style={{ ...textareaStyle(errors.rationale), border: `1.5px solid ${errors.rationale ? "#fca5a5" : "#5eead4"}` }} onFocus={(e) => { e.target.style.borderColor = "#14b8a6"; e.target.style.boxShadow = "0 0 0 3px rgba(20,184,166,0.12)"; }} onBlur={(e) => { e.target.style.borderColor = errors.rationale ? "#fca5a5" : "#5eead4"; e.target.style.boxShadow = "none"; }} />
+            <Field
+              label="Meaning & Rationale"
+              required
+              hint="How does this name connect to our mission of bridging languages and cultures?"
+              error={errors.rationale}
+            >
+              <textarea
+                value={form.rationale}
+                onChange={set("rationale")}
+                placeholder="Explain the meaning behind your proposed name…"
+                rows={4}
+                style={{ ...textareaStyle(errors.rationale), border: `1.5px solid ${errors.rationale ? "#fca5a5" : "#5eead4"}` }}
+                onFocus={(e) => { e.target.style.borderColor = "#14b8a6"; e.target.style.boxShadow = "0 0 0 3px rgba(20,184,166,0.12)"; }}
+                onBlur={(e) => { e.target.style.borderColor = errors.rationale ? "#fca5a5" : "#5eead4"; e.target.style.boxShadow = "none"; }}
+              />
             </Field>
-            <Field label="How It Unifies" required hint="How does this name avoid dominance by any legacy group and represent all of us?" error={errors.unification}>
-              <textarea value={form.unification} onChange={set("unification")} placeholder="Describe how this name creates shared ownership…" rows={4} style={{ ...textareaStyle(errors.unification), border: `1.5px solid ${errors.unification ? "#fca5a5" : "#5eead4"}` }} onFocus={(e) => { e.target.style.borderColor = "#14b8a6"; e.target.style.boxShadow = "0 0 0 3px rgba(20,184,166,0.12)"; }} onBlur={(e) => { e.target.style.borderColor = errors.unification ? "#fca5a5" : "#5eead4"; e.target.style.boxShadow = "none"; }} />
+            <Field
+              label="How It Unifies"
+              required
+              hint="How does this name avoid dominance by any legacy group and represent all of us?"
+              error={errors.unification}
+            >
+              <textarea
+                value={form.unification}
+                onChange={set("unification")}
+                placeholder="Describe how this name creates shared ownership…"
+                rows={4}
+                style={{ ...textareaStyle(errors.unification), border: `1.5px solid ${errors.unification ? "#fca5a5" : "#5eead4"}` }}
+                onFocus={(e) => { e.target.style.borderColor = "#14b8a6"; e.target.style.boxShadow = "0 0 0 3px rgba(20,184,166,0.12)"; }}
+                onBlur={(e) => { e.target.style.borderColor = errors.unification ? "#fca5a5" : "#5eead4"; e.target.style.boxShadow = "none"; }}
+              />
             </Field>
-            <Field label="Real-World Test" required hint="Write one sentence showing how the name would be used in practice." error={errors.realWorldTest}>
-              <input type="text" value={form.realWorldTest} onChange={set("realWorldTest")} placeholder={'"The [Team Name] connected a Deaf patient to an ASL interpreter…"'} style={{ ...inputStyle(errors.realWorldTest), border: `1.5px solid ${errors.realWorldTest ? "#fca5a5" : "#5eead4"}` }} onFocus={(e) => { e.target.style.borderColor = "#14b8a6"; e.target.style.boxShadow = "0 0 0 3px rgba(20,184,166,0.12)"; }} onBlur={(e) => { e.target.style.borderColor = errors.realWorldTest ? "#fca5a5" : "#5eead4"; e.target.style.boxShadow = "none"; }} />
+            <Field
+              label="Real-World Test"
+              required
+              hint="Write one sentence showing how the name would be used in practice."
+              error={errors.realWorldTest}
+            >
+              <input
+                type="text"
+                value={form.realWorldTest}
+                onChange={set("realWorldTest")}
+                placeholder={'"The [Team Name] connected a Deaf patient to an ASL interpreter…"'}
+                style={{ ...inputStyle(errors.realWorldTest), border: `1.5px solid ${errors.realWorldTest ? "#fca5a5" : "#5eead4"}` }}
+                onFocus={(e) => { e.target.style.borderColor = "#14b8a6"; e.target.style.boxShadow = "0 0 0 3px rgba(20,184,166,0.12)"; }}
+                onBlur={(e) => { e.target.style.borderColor = errors.realWorldTest ? "#fca5a5" : "#5eead4"; e.target.style.boxShadow = "none"; }}
+              />
             </Field>
           </div>
         </div>
 
+        {/* section: optional */}
         <div style={cardStyle("linear-gradient(135deg, rgba(250,232,255,0.5), rgba(237,233,254,0.5))")}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg, #e9d5ff, #c4b5fd)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
+            <div
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 10,
+                background: "linear-gradient(135deg, #e9d5ff, #c4b5fd)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+              </svg>
             </div>
             <h2 style={{ fontSize: 18, fontWeight: 700, color: "#581c87" }}>Optional Extras</h2>
           </div>
-          <p style={{ fontSize: 12, color: "#c4b5fd", marginBottom: 20, marginLeft: 46, fontWeight: 500 }}>These aren't required, but they can strengthen your submission.</p>
+          <p style={{ fontSize: 12, color: "#c4b5fd", marginBottom: 20, marginLeft: 46, fontWeight: 500 }}>
+            These aren't required, but they can strengthen your submission.
+          </p>
           <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-            <Field label="Linguistic / Cultural Significance" hint="Does your name carry meaning in another language, sign language, or culture?">
-              <textarea value={form.culturalSignificance} onChange={set("culturalSignificance")} placeholder="Share any linguistic roots, translations, or cultural connections…" rows={3} style={{ ...textareaStyle(), border: "1.5px solid #d8b4fe" }} onFocus={(e) => { e.target.style.borderColor = "#a78bfa"; e.target.style.boxShadow = "0 0 0 3px rgba(167,139,250,0.12)"; }} onBlur={(e) => { e.target.style.borderColor = "#d8b4fe"; e.target.style.boxShadow = "none"; }} />
+            <Field
+              label="Linguistic / Cultural Significance"
+              hint="Does your name carry meaning in another language, sign language, or culture?"
+            >
+              <textarea
+                value={form.culturalSignificance}
+                onChange={set("culturalSignificance")}
+                placeholder="Share any linguistic roots, translations, or cultural connections…"
+                rows={3}
+                style={{ ...textareaStyle(), border: "1.5px solid #d8b4fe" }}
+                onFocus={(e) => { e.target.style.borderColor = "#a78bfa"; e.target.style.boxShadow = "0 0 0 3px rgba(167,139,250,0.12)"; }}
+                onBlur={(e) => { e.target.style.borderColor = "#d8b4fe"; e.target.style.boxShadow = "none"; }}
+              />
             </Field>
             <Field label="Tagline">
-              <input type="text" value={form.tagline} onChange={set("tagline")} placeholder='"Bridging Languages, Connecting Lives"' style={{ ...inputStyle(), border: "1.5px solid #d8b4fe" }} onFocus={(e) => { e.target.style.borderColor = "#a78bfa"; e.target.style.boxShadow = "0 0 0 3px rgba(167,139,250,0.12)"; }} onBlur={(e) => { e.target.style.borderColor = "#d8b4fe"; e.target.style.boxShadow = "none"; }} />
+              <input
+                type="text"
+                value={form.tagline}
+                onChange={set("tagline")}
+                placeholder='"Bridging Languages, Connecting Lives"'
+                style={{ ...inputStyle(), border: "1.5px solid #d8b4fe" }}
+                onFocus={(e) => { e.target.style.borderColor = "#a78bfa"; e.target.style.boxShadow = "0 0 0 3px rgba(167,139,250,0.12)"; }}
+                onBlur={(e) => { e.target.style.borderColor = "#d8b4fe"; e.target.style.boxShadow = "none"; }}
+              />
             </Field>
           </div>
         </div>
 
+        {/* submit */}
         <div style={{ textAlign: "center", marginTop: 24 }}>
           <button
             onClick={submit}
@@ -512,7 +646,9 @@ export default function App() {
               height: 52,
               padding: "0 36px",
               borderRadius: 100,
-              background: submitting ? "linear-gradient(135deg, #a5b4fc, #818cf8)" : "linear-gradient(135deg, #6366f1, #4f46e5, #7c3aed)",
+              background: submitting
+                ? "linear-gradient(135deg, #a5b4fc, #818cf8)"
+                : "linear-gradient(135deg, #6366f1, #4f46e5, #7c3aed)",
               color: "white",
               fontSize: 15,
               fontWeight: 700,
@@ -539,16 +675,20 @@ export default function App() {
             )}
           </button>
           {submitError && (
-            <p style={{ color: "#ef4444", fontSize: 13, marginTop: 12, fontWeight: 500 }}>{submitError}</p>
+            <p style={{ color: "#ef4444", fontSize: 13, marginTop: 12, fontWeight: 500 }}>
+              {submitError}
+            </p>
           )}
           <p style={{ color: "#94a3b8", fontSize: 12, marginTop: 16, lineHeight: 1.5 }}>
-            Submissions close on <span style={{ color: "#475569", fontWeight: 600 }}>Friday, March 13</span>.
+            Submissions close on{" "}
+            <span style={{ color: "#475569", fontWeight: 600 }}>Friday, March 13</span>.
             <br />
             All entries will be reviewed by the Unity Committee.
           </p>
         </div>
       </main>
 
+      {/* footer */}
       <footer
         style={{
           borderTop: "1px solid rgba(165,180,252,0.3)",
