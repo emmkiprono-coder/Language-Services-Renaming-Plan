@@ -1,27 +1,32 @@
 import { useState } from "react";
 
-/* ───────── JSONBin config ─────────
-   Each submission creates a new bin in your account.
-   No Collection required — works on free tier.
-   ─────────────────────────────────── */
-const JSONBIN_API_KEY = "$2a$10$M6W9ulyMKcxTdIcDcjhuVOm12ccNO2UeYG9e581pkl4mA3aX5Dvu.";
+/* ───────── Supabase config ───────── */
+const SUPABASE_URL = "https://maqhsewvvemcaaaxavop.supabase.co";
+const SUPABASE_KEY = "sb_publishable_pGyVjqptkLhYqwe2rI85Lw_u1TLqK5F";
 
-async function saveToJsonBin(entry: Record<string, unknown>) {
-  const res = await fetch("https://api.jsonbin.io/v3/b", {
+async function saveSubmission(entry: Record<string, unknown>) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/submissions`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "X-Access-Key": JSONBIN_API_KEY,
-      "X-Bin-Name": `submission-${Date.now()}`,
-      "X-Bin-Private": "false",
+      "apikey": SUPABASE_KEY,
+      "Prefer": "return=minimal",
     },
-    body: JSON.stringify(entry),
+    body: JSON.stringify({
+      full_name: entry.fullName,
+      department: entry.department,
+      proposed_name: entry.proposedName,
+      rationale: entry.rationale,
+      unification: entry.unification,
+      real_world_test: entry.realWorldTest,
+      cultural_significance: entry.culturalSignificance || null,
+      tagline: entry.tagline || null,
+    }),
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err.message || `JSONBin failed: ${res.status}`);
+    throw new Error(err.message || `Submission failed: ${res.status}`);
   }
-  return res.json();
 }
 
 /* ───────── types ───────── */
@@ -174,10 +179,7 @@ export default function App() {
     setSubmitting(true);
     setSubmitError("");
     try {
-      await saveToJsonBin({
-        ...form,
-        submittedAt: new Date().toISOString(),
-      });
+      await saveSubmission(form);
       setSubmitted(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err: unknown) {
